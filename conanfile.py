@@ -14,8 +14,8 @@ class Libxml2Conan(ConanFile):
     license = "MIT"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {'shared': False, 'fPIC': True}
-    requires = "zlib/1.2.11@conanos/dev", "libiconv/1.15@conanos/dev"
+    default_options = 'shared=False', 'fPIC=False'
+    requires = "zlib/1.2.11@conanos/stable", "libiconv/1.15@conanos/stable"
     exports = ["LICENSE.md"]
     exports_sources = ["FindLibXml2.cmake"]
     _source_subfolder = "source_subfolder"
@@ -23,6 +23,18 @@ class Libxml2Conan(ConanFile):
     @property
     def _is_msvc(self):
         return self.settings.compiler == 'Visual Studio'
+
+
+    def _is_sdk(self,sdk):
+        SDK = os.environ.get('CONANOS_SDK',None)
+        if not SDK:
+            self.output.warn('''
+            ========================================================
+            You didn't set sdk to build, please make sure that !
+            If you forgot, please set env var CONANOS_SDK to yours.
+            ========================================================
+            ''')
+        return sdk == SDK
 
     def source(self):
         tools.get("http://xmlsoft.org/sources/libxml2-{0}.tar.gz".format(self.version))
@@ -34,6 +46,11 @@ class Libxml2Conan(ConanFile):
 
     def configure(self):
         del self.settings.compiler.libcxx
+        
+        if self._is_sdk('webstreamer'):
+            self.options['zlib'].shared = True
+            self.options['libiconv'].shared = True
+
 
     def build(self):
         if self._is_msvc:
