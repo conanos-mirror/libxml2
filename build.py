@@ -22,6 +22,9 @@ if __name__ == "__main__":
         version  = m.group('version')
         arch     = 'x86_64' if not m.group('arch') else m.group('arch')
         docker_entry_script ='/bin/bash docker_entry_script.sh %s %s %s'%(compiler,version,arch)
+        CONANOS_SDK=os.environ.get("CONANOS_SDK")
+        if CONANOS_SDK:
+            docker_entry_script += " && export CONANOS_SDK=%s"%CONANOS_SDK
     
         
     builder = ConanMultiPackager(docker_entry_script=docker_entry_script)
