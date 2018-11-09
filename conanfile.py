@@ -14,7 +14,7 @@ class Libxml2Conan(ConanFile):
     license = "MIT"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {'shared': True, 'fPIC': True}
+    default_options = {'shared': False, 'fPIC': True}
     requires = "zlib/1.2.11@conanos/dev", "libiconv/1.15@conanos/dev"
     exports = ["LICENSE.md"]
     exports_sources = ["FindLibXml2.cmake"]
