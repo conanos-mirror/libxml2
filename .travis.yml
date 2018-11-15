@@ -13,6 +13,8 @@ env:
      - CONAN_DOCKER_32_IMAGES: 1
      - CONANOS_SCHEME: webstreamer
 
+     - CONAN_ARCHS: x86_64
+
 linux: &linux
    os: linux
    dist: xenial
