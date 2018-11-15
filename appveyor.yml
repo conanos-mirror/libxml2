@@ -8,7 +8,6 @@ branches:
 environment:
     PYTHON: "C:\\Python37"
 
-    CONAN_REFERENCE: "libxml2/2.9.8"
     CONAN_USERNAME: "conanos"
     CONAN_LOGIN_USERNAME: "mingyiz"
     CONAN_CHANNEL: "stable"
@@ -16,12 +15,13 @@ environment:
     CONAN_STABLE_BRANCH_PATTERN: "stable/*"
     CONAN_UPLOAD_ONLY_WHEN_STABLE: 1 # Will only upload when the branch matches "stable/*"
 
-    CONANOS_SDK: webstreamer
+    CONANOS_SCHEME: webstreamer
 
     matrix:
 
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
+          CONAN_ARCHS: x86_64
 
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/

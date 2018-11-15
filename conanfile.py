@@ -3,7 +3,7 @@
 import glob
 import os
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
-
+from conanos.build import config_scheme
 
 class Libxml2Conan(ConanFile):
     name = "libxml2"
@@ -25,16 +25,6 @@ class Libxml2Conan(ConanFile):
         return self.settings.compiler == 'Visual Studio'
 
 
-    def _is_sdk(self,sdk):
-        SDK = os.environ.get('CONANOS_SDK',None)
-        if not SDK:
-            self.output.warn('''
-            ========================================================
-            You didn't set sdk to build, please make sure that !
-            If you forgot, please set env var CONANOS_SDK to yours.
-            ========================================================
-            ''')
-        return sdk == SDK
 
     def source(self):
         tools.get("http://xmlsoft.org/sources/libxml2-{0}.tar.gz".format(self.version))
@@ -46,10 +36,8 @@ class Libxml2Conan(ConanFile):
 
     def configure(self):
         del self.settings.compiler.libcxx
-        
-        if self._is_sdk('webstreamer'):
-            self.options['zlib'].shared = True
-            self.options['libiconv'].shared = True
+		
+        config_scheme(self)
 
 
     def build(self):
