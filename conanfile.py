@@ -4,6 +4,7 @@ import glob
 import os
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
 from conanos.build import config_scheme
+import shutil
 
 class Libxml2Conan(ConanFile):
     name = "libxml2"
@@ -14,7 +15,7 @@ class Libxml2Conan(ConanFile):
     license = "MIT"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = 'shared=False', 'fPIC=False'
+    default_options = 'shared=True', 'fPIC=True'
     requires = "zlib/1.2.11@conanos/stable", "libiconv/1.15@conanos/stable"
     exports = ["LICENSE.md"]
     exports_sources = ["FindLibXml2.cmake"]
@@ -130,6 +131,31 @@ class Libxml2Conan(ConanFile):
             os.unlink(os.path.join(self.package_folder, 'lib', 'libxml2_a_dll.lib'))
             os.unlink(os.path.join(self.package_folder, 'lib',
                                    'libxml2_a.lib' if self.options.shared else 'libxml2.lib'))
+        
+        if self.settings.os == "Windows":
+            tools.mkdir(os.path.join(self.package_folder,"lib","pkgconfig"))
+            shutil.copyfile(os.path.join(self.build_folder,self._source_subfolder,"libxml-2.0.pc.in"),
+                            os.path.join(self.package_folder,"lib","pkgconfig", "libxml-2.0.pc"))
+            replacements_pc = {
+                "@prefix@"            :  self.package_folder,
+                "@exec_prefix@"       :  "${prefix}/bin",
+                "@libdir@"            :  "${prefix}/lib",
+                "@includedir@"        :  "${prefix}/include",
+                "@WITH_MODULES@"      :  "",
+                "@VERSION@"           :  self.version,
+                "@ICU_LIBS@"          :  "",
+                "@THREAD_LIBS@"       :  "",
+                "@Z_LIBS@"            :  "",
+                "@LZMA_LIBS@"         :  "",
+                "@ICONV_LIBS@"        :  "-liconv",
+                "@M_LIBS@"            :  "",
+                "@WIN32_EXTRA_LIBADD@":  "",
+                "@LIBS@"              :  "",
+                "@XML_INCLUDEDIR@"    :  "-I"+os.path.join(self.package_folder,"include","libxml2"),
+                "@XML_CFLAGS@"        :  "",
+            }
+            for s, r in replacements_pc.items():
+                tools.replace_in_file(os.path.join(self.package_folder,"lib","pkgconfig", "libxml-2.0.pc"),s,r)
 
     def package_info(self):
         if self._is_msvc:
